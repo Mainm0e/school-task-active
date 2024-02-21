@@ -1,9 +1,78 @@
-
+use std::env;
+use std::net::IpAddr;
 use tinyscanner::scan;
-#[tokio::main]
-async fn main() {
-    let ip = "127.0.0.1".parse().unwrap(); // Replace with the target IP address
-    /* let ports = vec![21,22,23,25,53,80,110,115,135,139,143,194,443,445,1433,3306,3389,5632,5900,8080,25565]; // Add the ports you want to scan */
-    let ports = vec![8080, 8081]; // Add the ports you want to scan    
-    scan(ip, ports).await;
+
+fn main() {
+    // Get command line arguments
+    let args: Vec<String> = env::args().collect();
+
+    // Check if there are enough arguments
+    if args.len() < 5 {
+        eprintln!("Usage: {} [-u | -t] <HOST> -p <PORT>", args[0]);
+        std::process::exit(1);
+    }
+
+    // Parse command line options
+    let mut protocol = "tcp"; // Default protocol is TCP
+    let mut ip_str : &str = "";
+    let mut ports = Vec::new();
+
+    let mut i = 1;
+    while i < args.len() {
+        match args[i].as_str() {
+            "-u" => {
+                protocol = "udp";
+            }
+            "-t" => {
+                protocol = "tcp";
+            }
+            "-p" => {
+                i += 1;
+                if i < args.len() {
+                    match args[i].parse::<u16>() {
+                        Ok(port) => {
+                            ports.push(port);
+                        }
+                        Err(_) => {
+                            eprintln!("Invalid port number: {}", args[i]);
+                            std::process::exit(1);
+                        }
+                    }
+                } else {
+                    eprintln!("Missing port number after -p option");
+                    std::process::exit(1);
+                }
+            }
+            _ => {
+                ip_str = &args[i];
+            }
+        }
+        i += 1;
+    }
+
+        // Check if IP is provided
+        if ip_str.is_empty() {
+            eprintln!("Missing target IP address");
+            std::process::exit(1);
+        }
+    
+        // Parse IP address
+        let ip: IpAddr = match ip_str.parse() {
+            Ok(ip) => ip,
+            Err(_) => {
+                eprintln!("Invalid IP address: {}", ip_str);
+                std::process::exit(1);
+            }
+        };
+    
+
+    // Check if port is provided
+    if ports.is_empty() {
+        eprintln!("Missing port number");
+        std::process::exit(1);
+    }
+    // Perform scanning
+    for port in ports {
+        scan(ip, port, protocol);
+    }
 }
