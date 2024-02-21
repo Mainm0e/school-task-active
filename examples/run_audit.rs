@@ -1,5 +1,7 @@
 use tinyscanner::scan;
 
+// This is a simple example of how to use the tinyscanner library
+// to scan a range of ports on a target IP address
 
  fn main() {
     let ip = "127.0.0.1".parse().unwrap(); // Replace with the target IP address

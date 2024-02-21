@@ -12,3 +12,5 @@ crate-type = ["lib"]
 [dependencies]
 
 tokio = { version = "1", features = ["full"] }
+clap = "2.33.3"
+

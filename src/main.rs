@@ -5,6 +5,17 @@ use tinyscanner::scan;
 fn main() {
     // Get command line arguments
     let args: Vec<String> = env::args().collect();
+       
+    if  args[1] == "--help" {
+        print!("
+        Usage: cargo run --release -- [OPTIONS] [HOST] [PORT]\n
+        Options:\n
+        -p\t\t\tRange of ports to scan\n
+        -u\t\t\tUDP scan\n
+        -t\t\t\tTCP scan\n
+        --help\t\t\tPrints help information\n\n");
+        std::process::exit(1);
+    }
 
     // Check if there are enough arguments
     if args.len() < 5 {
