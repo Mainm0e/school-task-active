@@ -40,15 +40,8 @@ fn main() {
             "-p" => {
                 i += 1;
                 if i < args.len() {
-                    match args[i].parse::<u16>() {
-                        Ok(port) => {
-                            ports.push(port);
-                        }
-                        Err(_) => {
-                            eprintln!("Invalid port number: {}", args[i]);
-                            std::process::exit(1);
-                        }
-                    }
+                    let port_arg = &args[i];
+                    ports.extend(parse_port_range(port_arg));
                 } else {
                     eprintln!("Missing port number after -p option");
                     std::process::exit(1);
@@ -85,5 +78,27 @@ fn main() {
     // Perform scanning
     for port in ports {
         scan(ip, port, protocol);
+    }
+}
+
+// Helper function to parse port ranges
+fn parse_port_range(range: &str) -> Vec<u16> {
+    match range {
+        "-" => (1..=65535).collect(),  // Include all ports
+        _ => {
+            let parts: Vec<&str> = range.split('-').collect();
+            match parts.len() {
+                1 => vec![parts[0].parse::<u16>().expect("Invalid port number")],
+                2 => {
+                    let start = parts[0].parse::<u16>().expect("Invalid starting port number");
+                    let end = parts[1].parse::<u16>().expect("Invalid ending port number");
+                    (start..=end).collect()
+                }
+                _ => {
+                    eprintln!("Invalid port range format: {}", range);
+                    std::process::exit(1);
+                }
+            }
+        }
     }
 }
