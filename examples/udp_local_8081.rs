@@ -31,13 +31,13 @@ impl UdpServer {
         }
     }
 
-    async fn handle_udp_packet(&self, data: Vec<u8>, client_addr: SocketAddr) {
-        println!("Received UDP packet from {}: {:?}", client_addr, data);
+    async fn handle_udp_packet(&self, _data: Vec<u8>, client_addr: SocketAddr) {
+        // This method sends a response regardless of the data received
         let response_msg = "Hello from the server!";
         let _ = self.socket.send_to(response_msg.as_bytes(), client_addr).await;
         println!("Sent UDP response to {}", client_addr);
-
     }
+    
 
 }
 
